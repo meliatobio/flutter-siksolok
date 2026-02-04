@@ -13,7 +13,9 @@ class IndikatorImageMapper {
         return 'assets/images/indeks-pembangunan-manusia.png';  // contoh penyesuaian
       case 'pdrb':
         return 'assets/images/pdrb.png';
-      case 'indeks-kemahalan-konstruksi':
+      case 'kemiskinan':
+        return 'assets/images/kemiskinan.png';
+      case 'indeks-kemahalan-kontruksi':
         return 'assets/images/indeks-kemahalan-konstruksi.png';
       case 'ketimpangan-gender':
         return 'assets/images/ketimpangan-gender.png';
@@ -21,10 +23,8 @@ class IndikatorImageMapper {
         return 'assets/images/produksi-tanaman-pangan.png';
       case 'sanitasi-dan-air':
         return 'assets/images/sanitasi-dan-air.png';
-      case 'industri-pengolahan-mikrokecil':
+      case 'industri-pengolahan-mikro-kecil':
         return 'assets/images/industri-pengolahan-mikrokecil.png';
-      case 'pdrb':
-        return 'assets/images/pdrb.png';
        default:
         return 'assets/images/default.png';
     }
