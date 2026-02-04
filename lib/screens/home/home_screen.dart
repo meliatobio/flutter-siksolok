@@ -308,8 +308,8 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
 
           DraggableScrollableSheet(
-            initialChildSize: 0.47,
-            minChildSize: 0.47,
+            initialChildSize: 0.65,
+            minChildSize: 0.65,
             maxChildSize: 0.78,
             builder: (context, scrollController) {
               return Container(
@@ -451,7 +451,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: const Text(
-                                      'indikatorDetails KOSONG',
+                                      'Data Indikator Tidak Tersedia',
                                       style: TextStyle(
                                         fontSize: 12,
                                         color: Colors.red,

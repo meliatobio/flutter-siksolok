@@ -4,6 +4,7 @@ import 'package:siksolok/app/routers.dart';
 import 'package:siksolok/controllers/tahun_controller.dart';
 import 'package:siksolok/models/indikator.dart';
 import 'package:siksolok/services/indikator_service.dart';
+import 'package:siksolok/utils/indikator_image_mapper.dart';
 
 class IndikatorScreen extends StatelessWidget {
   IndikatorScreen({super.key});
@@ -156,15 +157,27 @@ class IndikatorScreen extends StatelessWidget {
                                     borderRadius:
                                         BorderRadius.circular(10),
                                   ),
-                                  child: const Icon(
-                                    Icons.insert_chart_outlined,
-                                    color: Color(0xFF2D95C9),
-                                    size: 28,
+                                  child: Image.asset(
+                                    IndikatorImageMapper.getImage(
+                                        indikator.slug),
+                                    width: 28,
+                                    height: 28,
+                                    fit: BoxFit.contain,
+                                    errorBuilder:
+                                        (context, error, stackTrace) {
+                                      return Image.asset(
+                                        'assets/images/default.png',
+                                        width: 28,
+                                        height: 28,
+                                      );
+                                    },
                                   ),
                                 ),
                                 const SizedBox(height: 10),
                                 Text(
                                   indikator.namaIndikator,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
                                   textAlign: TextAlign.center,
                                   style: const TextStyle(
                                     fontFamily: 'Poppins',
