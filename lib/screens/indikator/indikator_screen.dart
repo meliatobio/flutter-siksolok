@@ -149,30 +149,36 @@ class IndikatorScreen extends StatelessWidget {
                               mainAxisAlignment:
                                   MainAxisAlignment.center,
                               children: [
-                                Container(
-                                  padding: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF2D95C9)
-                                        .withValues(alpha: 0.15),
-                                    borderRadius:
-                                        BorderRadius.circular(10),
-                                  ),
-                                  child: Image.asset(
-                                    IndikatorImageMapper.getImage(
-                                        indikator.slug),
-                                    width: 28,
-                                    height: 28,
-                                    fit: BoxFit.contain,
-                                    errorBuilder:
-                                        (context, error, stackTrace) {
-                                      return Image.asset(
-                                        'assets/images/default.png',
-                                        width: 28,
-                                        height: 28,
-                                      );
-                                    },
-                                  ),
-                                ),
+                               Container(
+  padding: const EdgeInsets.all(10),
+  decoration: BoxDecoration(
+    gradient: const LinearGradient(
+      colors: [
+        Color(0xFF2D95C9), // biru
+        Color(0xFF75B547), // hijau
+        Color(0xFFE18939), // oren
+      ],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    ),
+    borderRadius: BorderRadius.circular(10),
+  ),
+  child: Image.asset(
+    IndikatorImageMapper.getImage(indikator.slug),
+    width: 28,
+    height: 28,
+    fit: BoxFit.contain,
+    color: Colors.white, // 🔥 icon kontras
+    errorBuilder: (context, error, stackTrace) {
+      return Image.asset(
+        'assets/images/default.png',
+        width: 28,
+        height: 28,
+      );
+    },
+  ),
+),
+
                                 const SizedBox(height: 10),
                                 Text(
                                   indikator.namaIndikator,

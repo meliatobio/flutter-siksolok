@@ -10,6 +10,7 @@ import 'package:siksolok/screens/indikator/indikator_detail_screen.dart';
 import 'package:siksolok/services/dashboard_service.dart';
 //import 'package:siksolok/widgets/build_stat_card.dart';
 import 'package:siksolok/services/indikator_service.dart';
+import 'package:siksolok/utils/indikator_image_mapper.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -72,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
       // Optional: buat notifications untuk carousel (ambil 3 saja)
       final notif = details.take(3).map((d) {
-        String description = '-';
+        String description = 'Belum ada data untuk ditampilkan';
         if (d.kategoris.isNotEmpty) {
           description = d.kategoris[0].deskripsi;
         }
@@ -230,78 +231,82 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                   ),
-                  CarouselSlider(
-                    items: notifications.map((notif) {
-                      return GestureDetector(
-                        onTap: () {
-                          final slug =
-                              indikatorDetails[indexFromNotif(notif['title']!)]
-                                  .slug;
-                          Get.to(
-                            () => const IndikatorDetailScreen(),
-                            arguments: {'slug': slug},
-                          );
-                        },
-                        child: SizedBox(
-                          width: double.infinity,
-                          height: 160,
-                          child: Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 1),
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(8),
-                              boxShadow: const [
-                                BoxShadow(
-                                  color: Colors.black12,
-                                  blurRadius: 5,
-                                  offset: Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Tahun ${notif['year']}',
-                                  style: const TextStyle(
-                                    fontSize: 10,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                                const SizedBox(height: 6),
-                                Text(
-                                  notif['title']!,
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  notif['description']!,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.grey[700],
-                                  ),
-                                  maxLines: 4,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                    options: CarouselOptions(
-                      height: 160,
-                      autoPlay: true,
-                      enlargeCenterPage:
-                          true, // Ini yang bikin item tengah membesar
-                      viewportFraction:
-                          0.8, // Lebar tiap item (lebih kecil dari 1 agar terlihat item samping)
-                    ),
+             CarouselSlider(
+  items: notifications.map((notif) {
+    return GestureDetector(
+      onTap: () {
+        final slug =
+            indikatorDetails[indexFromNotif(notif['title']!)].slug;
+        Get.to(
+          () => const IndikatorDetailScreen(),
+          arguments: {'slug': slug},
+        );
+      },
+      child: SizedBox(
+        width: double.infinity,
+        height: 160, // TETAP
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 1),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 5,
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Tahun ${notif['year']}',
+                style: const TextStyle(
+                  fontSize: 10,
+                  color: Colors.grey,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                notif['title']!,
+                maxLines: 2, // 🔒 jaga tinggi
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 4),
+
+              // ⬇️ SATU-SATUNYA PERUBAHAN
+              Expanded(
+                child: Text(
+                  notif['description']!,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey[700],
                   ),
+                  maxLines: 4,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }).toList(),
+  options: CarouselOptions(
+    height: 160,
+    autoPlay: true,
+    enlargeCenterPage: true,
+    viewportFraction: 0.8,
+  ),
+),
+
                 ],
               ),
             ),
@@ -474,37 +479,97 @@ class _HomeScreenState extends State<HomeScreen> {
                                             arguments: {'slug': d.slug},
                                           );
                                         },
-                                        child: Container(
-                                          width: 230,
-                                          margin: EdgeInsets.only(
-                                            left: index == 0 ? 0 : 12,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: d.namaIndikator.isEmpty
-                                                ? Colors
-                                                      .orange[200] // indikator bermasalah
-                                                : Colors.grey[100],
-                                            borderRadius: BorderRadius.circular(
-                                              12,
-                                            ),
-                                          ),
-                                          child: Center(
-                                            child: Text(
-                                              d.namaIndikator.isNotEmpty
-                                                  ? d.namaIndikator
-                                                  : 'namaIndikator KOSONG',
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                fontFamily: 'Poppins',
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w600,
-                                                color: d.namaIndikator.isEmpty
-                                                    ? Colors.red
-                                                    : Colors.black,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
+                                        child:Container(
+  width: 240,
+  margin: const EdgeInsets.only(right: 12), // ⬅️ JARAK ANTAR CARD
+  padding: const EdgeInsets.all(14),
+  decoration: BoxDecoration(
+    borderRadius: BorderRadius.circular(16),
+    color: Colors.white,
+
+    // ⬇️ STROKE TIPIS ABU-ABU
+    border: Border.all(
+      color: Colors.grey.withOpacity(0.25),
+      width: 1,
+    ),
+
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black.withOpacity(0.08),
+        blurRadius: 10,
+        offset: const Offset(0, 6),
+      ),
+    ],
+  ),
+  child: Row(
+    children: [
+      // ICON (dari slug)
+        Container(
+  width: 44,
+  height: 44,
+  padding: const EdgeInsets.all(8),
+  decoration: BoxDecoration(
+    gradient: const LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [
+        Color(0xFF2D95C9),
+        Color(0xFF75B547),
+        Color(0xFFE18939),
+      ],
+    ),
+    borderRadius: BorderRadius.circular(12),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black.withOpacity(0.15),
+        blurRadius: 6,
+        offset: const Offset(0, 3),
+      ),
+    ],
+  ),
+  child: Image.asset(
+    IndikatorImageMapper.getImage(d.slug),
+    fit: BoxFit.contain,
+    color: Colors.white, // 🔥 icon jadi konsisten
+  ),
+),
+
+      const SizedBox(width: 12),
+
+      // TEXT
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              d.namaIndikator,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontFamily: 'Poppins',
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 4),
+            const Text(
+              'Lihat detail',
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontSize: 11,
+                color: Color(0xFF2D95C9),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ],
+  ),
+)
+
+
+
                                       );
                                     },
                                   ),
