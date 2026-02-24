@@ -6,18 +6,17 @@ class AboutService {
   static const String baseUrl = 'http://127.0.0.1:8000/api';
 
   /// 🔹 GET ALL ABOUTS
-  static Future<List<About>> fetchAbouts() async {
-    final response = await http.get(Uri.parse('$baseUrl/abouts'));
+static Future<List<About>> fetchAbouts() async {
+  final response = await http.get(Uri.parse('$baseUrl/abouts'));
 
-    if (response.statusCode == 200) {
-      final jsonData = json.decode(response.body);
-      final List list = jsonData['data'];
-
-      return list.map((e) => About.fromJson(e)).toList();
-    } else {
-      throw Exception('Gagal memuat data about');
-    }
+  if (response.statusCode == 200) {
+    final List jsonData = json.decode(response.body);
+    return jsonData.map((e) => About.fromJson(e)).toList();
+  } else {
+    throw Exception('Gagal memuat data about');
   }
+}
+
 
   /// 🔹 GET ABOUT BY ID (optional, tetap dipakai kalau perlu)
   static Future<About> getAboutById(int id) async {

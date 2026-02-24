@@ -14,10 +14,12 @@ class AboutScreen extends StatelessWidget {
         future: AboutService.fetchAbouts(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
+            print("⏳ Waiting for about data...");
             return const Center(child: CircularProgressIndicator());
           }
 
           if (snapshot.hasError) {
+            print("❌ FutureBuilder Error: ${snapshot.error}");
             return Center(
               child: Text(
                 'Error: ${snapshot.error}',
@@ -27,6 +29,7 @@ class AboutScreen extends StatelessWidget {
           }
 
           final abouts = snapshot.data!;
+          print("✅ Data loaded: ${abouts.length} items");
 
           return ListView(
             padding: const EdgeInsets.all(16),
@@ -86,6 +89,21 @@ class AboutScreen extends StatelessWidget {
 
   // ================= ACCORDION =================
   Widget _buildAccordion(About about) {
+    // Modifikasi: pakai about.imageUrl dari model
+    String? imageUrl;
+    if (about.imageUrl != null && about.imageUrl!.isNotEmpty) {
+      // Ambil nama file dari imageUrl
+      final uri = Uri.parse(about.imageUrl!);
+      final filename = uri.pathSegments.isNotEmpty ? uri.pathSegments.last : '';
+      if (filename.isNotEmpty) {
+        // Gunakan API proxy Laravel
+        imageUrl = 'http://localhost:8000/api/abouts/images/$filename';
+      }
+    }
+
+    print("📌 About Title: ${about.title}");
+    print("🖼️ Image URL: $imageUrl");
+
     return Column(
       children: [
         ExpansionTile(
@@ -106,21 +124,28 @@ class AboutScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  /// 🖼️ GAMBAR STRUKTUR ORGANISASI
-                  if (about.imageUrl != null && about.imageUrl!.isNotEmpty)
+                  /// 🖼️ GAMBAR
+                  if (imageUrl != null)
                     ClipRRect(
                       borderRadius: BorderRadius.circular(12),
                       child: Image.network(
-                        about.imageUrl!,
+                        imageUrl,
                         fit: BoxFit.contain,
                         loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
+                          if (loadingProgress == null) {
+                            print("✅ Image loaded: $imageUrl");
+                            return child;
+                          }
                           return const Padding(
                             padding: EdgeInsets.all(24),
                             child: Center(child: CircularProgressIndicator()),
                           );
                         },
                         errorBuilder: (context, error, stackTrace) {
+                          print("🚨 Image ERROR: $imageUrl");
+                          print("❌ Error Detail: $error");
+                          print("📍 StackTrace: $stackTrace");
+
                           return const Padding(
                             padding: EdgeInsets.all(8),
                             child: Text(
@@ -132,8 +157,7 @@ class AboutScreen extends StatelessWidget {
                       ),
                     ),
 
-                  if (about.imageUrl != null && about.imageUrl!.isNotEmpty)
-                    const SizedBox(height: 12),
+                  if (imageUrl != null) const SizedBox(height: 12),
 
                   /// 📄 KONTEN
                   Text(
