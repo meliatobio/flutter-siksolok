@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:siksolok/models/about_model.dart';
 
 class AboutService {
-  static const String baseUrl = 'http://127.0.0.1:8000/api';
+  static const String baseUrl = 'http://localhost:8000/api';
 
   /// 🔹 GET ALL ABOUTS
 static Future<List<About>> fetchAbouts() async {

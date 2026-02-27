@@ -6,7 +6,7 @@ import 'package:siksolok/models/indikator.dart';
 import 'package:siksolok/models/detail_indikator_model.dart';
 
 class IndikatorService {
-  static const String baseUrl = 'http://127.0.0.1:8000/api';
+  static const String baseUrl = 'http://localhost:8000/api';
 
   /// =============================
   /// GET LIST INDIKATOR (TOPIK)

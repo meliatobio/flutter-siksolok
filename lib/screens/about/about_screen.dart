@@ -99,7 +99,7 @@ class AboutScreen extends StatelessWidget {
         // Gunakan API proxy Laravel
         //imageUrl = 'http://localhost:8000/api/abouts/images/$filename';
        
-imageUrl = 'http://127.0.0.1:8000/storage/about/$filename';
+imageUrl = 'http://localhost:8000/storage/about/$filename';
       }
     }
 
