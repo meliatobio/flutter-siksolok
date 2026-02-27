@@ -77,7 +77,7 @@ class _IndikatorDetailScreenState extends State<IndikatorDetailScreen>
                       children: [
                         Image.asset(bgAsset, fit: BoxFit.cover),
                         BackdropFilter(
-                          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                          filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
                           child: Container(
                             color: Colors.black.withOpacity(0.2),
                           ),
