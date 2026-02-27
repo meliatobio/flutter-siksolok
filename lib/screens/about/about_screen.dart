@@ -97,7 +97,9 @@ class AboutScreen extends StatelessWidget {
       final filename = uri.pathSegments.isNotEmpty ? uri.pathSegments.last : '';
       if (filename.isNotEmpty) {
         // Gunakan API proxy Laravel
-        imageUrl = 'http://localhost:8000/api/abouts/images/$filename';
+        //imageUrl = 'http://localhost:8000/api/abouts/images/$filename';
+       
+imageUrl = 'http://127.0.0.1:8000/storage/about/$filename';
       }
     }
 

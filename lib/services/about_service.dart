@@ -10,8 +10,18 @@ static Future<List<About>> fetchAbouts() async {
   final response = await http.get(Uri.parse('$baseUrl/abouts'));
 
   if (response.statusCode == 200) {
-    final List jsonData = json.decode(response.body);
-    return jsonData.map((e) => About.fromJson(e)).toList();
+    final decoded = json.decode(response.body);
+
+    if (decoded is List) {
+      return decoded.map((e) => About.fromJson(e)).toList();
+    } else if (decoded is Map<String, dynamic>) {
+      final data = decoded['data'];
+      return (data as List)
+          .map((e) => About.fromJson(e))
+          .toList();
+    } else {
+      throw Exception('Format data tidak dikenali');
+    }
   } else {
     throw Exception('Gagal memuat data about');
   }

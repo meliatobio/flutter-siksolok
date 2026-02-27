@@ -153,39 +153,43 @@ class _IndikatorDetailScreenState extends State<IndikatorDetailScreen>
                         const SizedBox(height: 12),
 
                         // TabBar
-                        if (indikator.kategoris.isNotEmpty)
-                          Container(
-                            height: 50,
-                            decoration: BoxDecoration(
-                              color: Colors.blue.shade50,
-                              borderRadius: BorderRadius.circular(25),
-                            ),
-                            child: TabBar(
-                              controller: tabController,
-                              indicator: BoxDecoration(
-                                color: Colors.blue,
-                                borderRadius: BorderRadius.circular(25),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Colors.black26,
-                                    blurRadius: 4,
-                                    offset: Offset(0, 2),
-                                  ),
-                                ],
-                              ),
-                              labelColor: Colors.white,
-                              unselectedLabelColor: Colors.blue,
-                              labelStyle: const TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 14),
-                              tabs: indikator.kategoris
-                                  .map((kategori) => Tab(
-                                        child: Center(
-                                          child: Text(kategori.namaKategori),
-                                        ),
-                                      ))
-                                  .toList(),
-                            ),
-                          ),
+                       // TabBar
+if (indikator.kategoris.isNotEmpty)
+  SizedBox(
+    height: 48,
+    child: TabBar(
+      controller: tabController,
+      isScrollable: true, // ⬅️ penting agar fleksibel
+      indicator: BoxDecoration(
+        color:  Color(0xFFE18939),
+        borderRadius: BorderRadius.circular(30),
+      ),
+      labelColor: Colors.white,
+      unselectedLabelColor:  Color(0xFFE18939),
+      labelStyle: const TextStyle(
+        fontWeight: FontWeight.w600,
+        fontSize: 13,
+      ),
+      tabs: indikator.kategoris.map((kategori) {
+        return Tab(
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 18,
+              vertical: 8,
+            ),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(30),
+            ),
+            child: Text(
+              kategori.namaKategori,
+              overflow: TextOverflow.visible,
+              softWrap: false,
+            ),
+          ),
+        );
+      }).toList(),
+    ),
+  ),
 
                         const SizedBox(height: 16),
 
@@ -200,77 +204,44 @@ class _IndikatorDetailScreenState extends State<IndikatorDetailScreen>
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     // Card konten
-                                    Card(
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(16),
-                                      ),
-                                      elevation: 4,
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(16),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              parseKategoriDeskripsi(
-                                                  kategori.deskripsi, 2026),
-                                              style:
-                                                  const TextStyle(fontSize: 14),
-                                            ),
-                                            const SizedBox(height: 12),
-                                            if (kategori.gambar != null &&
-                                                kategori.gambar!.isNotEmpty)
-                                              ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                                child: Image.network(
-                                                  "$baseUrl/storage/${kategori.gambar}",
-                                                  width: double.infinity,
-                                                  height: 180,
-                                                  fit: BoxFit.cover,
-                                                  loadingBuilder:
-                                                      (context, child, progress) {
-                                                    if (progress == null) return child;
-                                                    return const SizedBox(
-                                                      height: 180,
-                                                      child: Center(
-                                                          child:
-                                                              CircularProgressIndicator()),
-                                                    );
-                                                  },
-                                                  errorBuilder:
-                                                      (context, error, stackTrace) {
-                                                    return SizedBox(
-                                                      height: 180,
-                                                      child: Center(
-                                                        child: Column(
-                                                          mainAxisSize:
-                                                              MainAxisSize.min,
-                                                          children: const [
-                                                            Icon(
-                                                              Icons.broken_image,
-                                                              size: 40,
-                                                              color: Colors.red,
-                                                            ),
-                                                            SizedBox(height: 4),
-                                                            Text(
-                                                              "Gagal load gambar",
-                                                              style: TextStyle(
-                                                                fontSize: 12,
-                                                                color: Colors.red,
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    );
-                                                  },
-                                                ),
-                                              ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
+                                   Container(
+  decoration: BoxDecoration(
+    color: Colors.white, // putih lebih solid
+    borderRadius: BorderRadius.circular(16),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black.withOpacity(0.08), // lebih soft & modern
+        blurRadius: 20,
+        offset: const Offset(0, 10),
+      ),
+    ],
+  ),
+  child: Padding(
+    padding: const EdgeInsets.all(16),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          parseKategoriDeskripsi(kategori.deskripsi, 2026),
+          style: const TextStyle(fontSize: 14),
+        ),
+        const SizedBox(height: 12),
+
+        if (kategori.gambar != null &&
+            kategori.gambar!.isNotEmpty)
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.network(
+              "$baseUrl/storage/${kategori.gambar}",
+              width: double.infinity,
+              height: 180,
+              fit: BoxFit.cover,
+            ),
+          ),
+      ],
+    ),
+  ),
+),
                                     const SizedBox(height: 12),
                                   ],
                                 ),
