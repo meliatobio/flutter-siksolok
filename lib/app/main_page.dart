@@ -39,7 +39,7 @@ class MainPage extends StatelessWidget {
           items: const [
             BottomNavigationBarItem(
               icon: Icon(Icons.home_outlined),
-              label: 'Beranda',
+              label: 'Home',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.dashboard_outlined),
