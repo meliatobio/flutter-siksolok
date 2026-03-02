@@ -5,6 +5,8 @@ import 'package:siksolok/services/about_service.dart';
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
 
+  static const String baseUrl = "http://192.168.3.220:8000";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -14,12 +16,10 @@ class AboutScreen extends StatelessWidget {
         future: AboutService.fetchAbouts(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            print("⏳ Waiting for about data...");
             return const Center(child: CircularProgressIndicator());
           }
 
           if (snapshot.hasError) {
-            print("❌ FutureBuilder Error: ${snapshot.error}");
             return Center(
               child: Text(
                 'Error: ${snapshot.error}',
@@ -29,7 +29,6 @@ class AboutScreen extends StatelessWidget {
           }
 
           final abouts = snapshot.data ?? [];
-          print("✅ Data loaded: ${abouts.length} items");
 
           return ListView(
             padding: const EdgeInsets.all(16),
@@ -56,12 +55,10 @@ class AboutScreen extends StatelessWidget {
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
               colors: [
                 Color(0xFF2D95C9),
                 Color(0xFF75B547),
-                Color(0xFFE18939)
+                Color(0xFFE18939),
               ],
             ),
             borderRadius: BorderRadius.only(
@@ -77,7 +74,6 @@ class AboutScreen extends StatelessWidget {
                 child: Text(
                   'About',
                   style: TextStyle(
-                    fontFamily: 'Poppins',
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -93,11 +89,19 @@ class AboutScreen extends StatelessWidget {
 
   // ================= ACCORDION =================
   Widget _buildAccordion(About about) {
-    // 🔥 LANGSUNG PAKAI URL DARI BACKEND
     String? imageUrl = about.imageUrl;
 
-    print("📌 About Title: ${about.title}");
-    print("🖼️ Image URL dari backend: $imageUrl");
+    if (imageUrl != null && imageUrl.isNotEmpty) {
+      imageUrl = imageUrl.trim();
+
+      // 🔥 Ambil nama file saja (logobps.png)
+      final fileName = imageUrl.split('/').last;
+
+      // 🔥 Paksa lewat API agar CORS aman
+      imageUrl = "$baseUrl/api/image/about/$fileName";
+    }
+
+    print("FINAL IMAGE URL: $imageUrl");
 
     return Column(
       children: [
@@ -105,13 +109,11 @@ class AboutScreen extends StatelessWidget {
           title: Text(
             about.title,
             style: const TextStyle(
-              fontFamily: 'Poppins',
               fontSize: 14,
               fontWeight: FontWeight.w600,
               color: Color.fromARGB(221, 54, 51, 51),
             ),
           ),
-          trailing: const Icon(Icons.keyboard_arrow_down),
           childrenPadding: const EdgeInsets.symmetric(vertical: 8),
           children: [
             Padding(
@@ -120,20 +122,15 @@ class AboutScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
 
-                  /// ================= GAMBAR =================
+                  // ================= GAMBAR =================
                   if (imageUrl != null && imageUrl.isNotEmpty)
                     ClipRRect(
                       borderRadius: BorderRadius.circular(12),
                       child: Image.network(
                         imageUrl,
                         fit: BoxFit.contain,
-
-                        loadingBuilder:
-                            (context, child, loadingProgress) {
-                          if (loadingProgress == null) {
-                            print("✅ Image loaded: $imageUrl");
-                            return child;
-                          }
+                        loadingBuilder: (context, child, progress) {
+                          if (progress == null) return child;
                           return const Padding(
                             padding: EdgeInsets.all(24),
                             child: Center(
@@ -141,13 +138,9 @@ class AboutScreen extends StatelessWidget {
                             ),
                           );
                         },
-
-                        errorBuilder:
-                            (context, error, stackTrace) {
-                          print("🚨 IMAGE ERROR");
-                          print("URL: $imageUrl");
-                          print("Error: $error");
-
+                        errorBuilder: (context, error, stackTrace) {
+                          print("🚨 IMAGE ERROR: $error");
+                          print("🚨 URL ERROR: $imageUrl");
                           return const Padding(
                             padding: EdgeInsets.all(8),
                             child: Text(
@@ -162,12 +155,11 @@ class AboutScreen extends StatelessWidget {
                   if (imageUrl != null && imageUrl.isNotEmpty)
                     const SizedBox(height: 12),
 
-                  /// ================= KONTEN =================
+                  // ================= KONTEN =================
                   Text(
                     about.content,
                     textAlign: TextAlign.justify,
                     style: const TextStyle(
-                      fontFamily: 'Poppins',
                       fontSize: 12,
                       color: Colors.grey,
                     ),

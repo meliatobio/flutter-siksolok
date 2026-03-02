@@ -6,17 +6,6 @@ import 'package:siksolok/services/indikator_service.dart';
 import 'package:siksolok/utils/parser.dart';
 import 'dart:ui';
 
-const String baseUrl = "http://localhost:8000";
-
-/// 🔥 FIX CORS IMAGE URL
-String fixImageUrl(String url) {
-  return url.replaceFirst(
-    '$baseUrl/storage/',
-    '$baseUrl/api/image/',
-  );
-}
-
-// Background kategori (asset)
 final Map<String, String> kategoriBackgrounds = {
   'Kemiskinan': 'assets/images/bg_kemiskinan.png',
   'Pendidikan': 'assets/images/bg_pendidikan.png',
@@ -34,12 +23,16 @@ class IndikatorDetailScreen extends StatefulWidget {
 class _IndikatorDetailScreenState
     extends State<IndikatorDetailScreen>
     with SingleTickerProviderStateMixin {
+
+  static const String baseUrl = "http://192.168.3.220:8000";
+
   late Future<IndikatorDetail> indikatorFuture;
-  late TabController tabController;
+  TabController? tabController;
 
   @override
   void initState() {
     super.initState();
+
     final args = Get.arguments as Map<String, dynamic>;
     final String slug = args['slug'];
 
@@ -50,11 +43,26 @@ class _IndikatorDetailScreenState
         IndikatorService.fetchIndikatorDetail(slug, tahun);
   }
 
+  /// ================= FIX IMAGE URL =================
+  String buildImageUrl(String originalUrl) {
+    if (originalUrl.isEmpty) return '';
+
+    final fileName = originalUrl.split('/').last;
+
+    final finalUrl =
+        "$baseUrl/api/image/kategori/$fileName";
+
+    debugPrint("FINAL IMAGE URL: $finalUrl");
+
+    return finalUrl;
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<IndikatorDetail>(
       future: indikatorFuture,
       builder: (context, snapshot) {
+
         if (snapshot.connectionState ==
             ConnectionState.waiting) {
           return const Scaffold(
@@ -65,28 +73,32 @@ class _IndikatorDetailScreenState
         if (snapshot.hasError) {
           return Scaffold(
             body: Center(
-                child: Text('Error: ${snapshot.error}')),
+              child: Text('Error: ${snapshot.error}'),
+            ),
           );
         }
 
         final indikator = snapshot.data!;
 
-        tabController = TabController(
+        tabController ??= TabController(
           length: indikator.kategoris.length,
           vsync: this,
-          initialIndex: Get.arguments['initialTab'] ?? 0,
+          initialIndex:
+              Get.arguments['initialTab'] ?? 0,
         );
 
         return Scaffold(
           backgroundColor: Colors.white,
           body: Stack(
             children: [
+
               /// ================= BACKGROUND =================
               AnimatedBuilder(
-                animation: tabController,
+                animation: tabController!,
                 builder: (context, child) {
                   final kategori =
-                      indikator.kategoris[tabController.index];
+                      indikator.kategoris[
+                          tabController!.index];
 
                   final bgAsset =
                       kategoriBackgrounds[
@@ -117,101 +129,141 @@ class _IndikatorDetailScreenState
               /// ================= BACK BUTTON =================
               SafeArea(
                 child: Padding(
-                  padding: const EdgeInsets.all(12),
+                  padding:
+                      const EdgeInsets.all(12),
                   child: CircleAvatar(
-                    backgroundColor: Colors.black38,
+                    backgroundColor:
+                        Colors.black38,
                     child: IconButton(
                       icon: const Icon(
                         Icons.arrow_back,
                         color: Colors.white,
                       ),
-                      onPressed: () => Get.back(),
+                      onPressed:
+                          () => Get.back(),
                     ),
                   ),
                 ),
               ),
 
-              /// ================= CONTENT SHEET =================
+              /// ================= CONTENT =================
               DraggableScrollableSheet(
                 initialChildSize: 0.68,
                 minChildSize: 0.68,
                 maxChildSize: 0.95,
-                builder: (context, scrollController) {
+                builder:
+                    (context, scrollController) {
+
                   return Container(
-                    decoration: const BoxDecoration(
+                    decoration:
+                        const BoxDecoration(
                       color: Colors.white,
                       borderRadius:
                           BorderRadius.vertical(
-                        top: Radius.circular(30),
+                        top:
+                            Radius.circular(30),
                       ),
                     ),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 16),
+                    padding:
+                        const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 16,
+                    ),
                     child: Column(
                       children: [
-                        /// Drag Handle
+
                         Container(
                           width: 40,
                           height: 5,
-                          margin: const EdgeInsets.only(
-                              bottom: 16),
-                          decoration: BoxDecoration(
-                            color: Colors.grey[300],
+                          margin:
+                              const EdgeInsets.only(
+                                  bottom: 16),
+                          decoration:
+                              BoxDecoration(
+                            color:
+                                Colors.grey[300],
                             borderRadius:
-                                BorderRadius.circular(10),
+                                BorderRadius
+                                    .circular(
+                                        10),
                           ),
                         ),
 
-                        /// Judul
                         Text(
-                          indikator.namaIndikator,
-                          style: const TextStyle(
+                          indikator
+                              .namaIndikator,
+                          style:
+                              const TextStyle(
                             fontSize: 22,
                             fontWeight:
                                 FontWeight.bold,
                           ),
                         ),
 
-                        const SizedBox(height: 16),
+                        const SizedBox(
+                            height: 16),
 
-                        /// ================= TAB BAR =================
-                        if (indikator.kategoris.isNotEmpty)
+                        if (indikator
+                            .kategoris
+                            .isNotEmpty)
                           SizedBox(
                             height: 48,
                             child: TabBar(
-                              controller: tabController,
-                              isScrollable: true,
-                              indicator: BoxDecoration(
+                              controller:
+                                  tabController,
+                              isScrollable:
+                                  true,
+                              indicator:
+                                  BoxDecoration(
                                 color:
-                                    const Color(0xFFE18939),
+                                    const Color(
+                                        0xFFE18939),
                                 borderRadius:
-                                    BorderRadius.circular(
-                                        30),
+                                    BorderRadius
+                                        .circular(
+                                            30),
                               ),
-                              labelColor: Colors.white,
+                              labelColor:
+                                  Colors.white,
                               unselectedLabelColor:
                                   const Color(
                                       0xFFE18939),
-                              tabs: indikator.kategoris
-                                  .map((kategori) =>
+                              tabs: indikator
+                                  .kategoris
+                                  .map((k) =>
                                       Tab(
-                                        text: kategori
+                                        text: k
                                             .namaKategori,
                                       ))
                                   .toList(),
                             ),
                           ),
 
-                        const SizedBox(height: 16),
+                        const SizedBox(
+                            height: 16),
 
-                        /// ================= TAB VIEW =================
                         Expanded(
-                          child: TabBarView(
-                            controller: tabController,
-                            children: indikator
-                                .kategoris
-                                .map((kategori) {
+                          child:
+                              TabBarView(
+                            controller:
+                                tabController,
+                            children:
+                                indikator
+                                    .kategoris
+                                    .map(
+                                (kategori) {
+
+                              final imageUrl =
+                                  (kategori.gambar !=
+                                              null &&
+                                          kategori
+                                              .gambar!
+                                              .isNotEmpty)
+                                      ? buildImageUrl(
+                                          kategori
+                                              .gambar!)
+                                      : '';
+
                               return SingleChildScrollView(
                                 controller:
                                     scrollController,
@@ -220,12 +272,13 @@ class _IndikatorDetailScreenState
                                       CrossAxisAlignment
                                           .start,
                                   children: [
-                                    /// Card
+
                                     Container(
                                       decoration:
                                           BoxDecoration(
                                         color:
-                                            Colors.white,
+                                            Colors
+                                                .white,
                                         borderRadius:
                                             BorderRadius
                                                 .circular(
@@ -240,19 +293,21 @@ class _IndikatorDetailScreenState
                                                 20,
                                             offset:
                                                 const Offset(
-                                                    0, 10),
+                                                    0,
+                                                    10),
                                           ),
                                         ],
                                       ),
                                       padding:
                                           const EdgeInsets
                                               .all(16),
-                                      child: Column(
+                                      child:
+                                          Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment
                                                 .start,
                                         children: [
-                                          /// Deskripsi
+
                                           Text(
                                             parseKategoriDeskripsi(
                                               kategori
@@ -269,54 +324,27 @@ class _IndikatorDetailScreenState
                                               height:
                                                   12),
 
-                                          /// ================= IMAGE =================
-                                          if (kategori
-                                                  .gambar !=
-                                              null &&
-                                              kategori
-                                                  .gambar!
-                                                  .isNotEmpty)
+                                          if (imageUrl
+                                              .isNotEmpty)
                                             ClipRRect(
                                               borderRadius:
-                                                  BorderRadius
-                                                      .circular(
-                                                          12),
+                                                  BorderRadius.circular(
+                                                      12),
                                               child:
                                                   Image.network(
-                                                fixImageUrl(
-                                                    kategori
-                                                        .gambar!),
-                                                width: double
-                                                    .infinity,
-                                                height: 180,
+                                                imageUrl,
+                                                width:
+                                                    double.infinity,
+                                                height:
+                                                    180,
                                                 fit: BoxFit
                                                     .cover,
-
-                                                /// Loading
-                                                loadingBuilder:
-                                                    (context,
-                                                        child,
-                                                        loadingProgress) {
-                                                  if (loadingProgress ==
-                                                      null) {
-                                                    return child;
-                                                  }
-                                                  return const SizedBox(
-                                                    height:
-                                                        180,
-                                                    child:
-                                                        Center(
-                                                      child:
-                                                          CircularProgressIndicator(),
-                                                    ),
-                                                  );
-                                                },
-
-                                                /// Error
                                                 errorBuilder:
                                                     (context,
                                                         error,
                                                         stackTrace) {
+                                                  debugPrint(
+                                                      "IMAGE ERROR: $error");
                                                   return const SizedBox(
                                                     height:
                                                         180,
@@ -324,8 +352,7 @@ class _IndikatorDetailScreenState
                                                         Center(
                                                       child:
                                                           Icon(
-                                                        Icons
-                                                            .broken_image,
+                                                        Icons.broken_image,
                                                         size:
                                                             40,
                                                         color:
@@ -339,8 +366,10 @@ class _IndikatorDetailScreenState
                                         ],
                                       ),
                                     ),
+
                                     const SizedBox(
-                                        height: 12),
+                                        height:
+                                            12),
                                   ],
                                 ),
                               );
