@@ -28,7 +28,7 @@ class AboutScreen extends StatelessWidget {
             );
           }
 
-          final abouts = snapshot.data!;
+          final abouts = snapshot.data ?? [];
           print("✅ Data loaded: ${abouts.length} items");
 
           return ListView(
@@ -58,7 +58,11 @@ class AboutScreen extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [Color(0xFF2D95C9), Color(0xFF75B547), Color(0xFFE18939)],
+              colors: [
+                Color(0xFF2D95C9),
+                Color(0xFF75B547),
+                Color(0xFFE18939)
+              ],
             ),
             borderRadius: BorderRadius.only(
               bottomLeft: Radius.circular(24),
@@ -89,22 +93,11 @@ class AboutScreen extends StatelessWidget {
 
   // ================= ACCORDION =================
   Widget _buildAccordion(About about) {
-    // Modifikasi: pakai about.imageUrl dari model
-    String? imageUrl;
-    if (about.imageUrl != null && about.imageUrl!.isNotEmpty) {
-      // Ambil nama file dari imageUrl
-      final uri = Uri.parse(about.imageUrl!);
-      final filename = uri.pathSegments.isNotEmpty ? uri.pathSegments.last : '';
-      if (filename.isNotEmpty) {
-        // Gunakan API proxy Laravel
-        //imageUrl = 'http://localhost:8000/api/abouts/images/$filename';
-       
-imageUrl = 'http://localhost:8000/storage/about/$filename';
-      }
-    }
+    // 🔥 LANGSUNG PAKAI URL DARI BACKEND
+    String? imageUrl = about.imageUrl;
 
     print("📌 About Title: ${about.title}");
-    print("🖼️ Image URL: $imageUrl");
+    print("🖼️ Image URL dari backend: $imageUrl");
 
     return Column(
       children: [
@@ -126,27 +119,34 @@ imageUrl = 'http://localhost:8000/storage/about/$filename';
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  /// 🖼️ GAMBAR
-                  if (imageUrl != null)
+
+                  /// ================= GAMBAR =================
+                  if (imageUrl != null && imageUrl.isNotEmpty)
                     ClipRRect(
                       borderRadius: BorderRadius.circular(12),
                       child: Image.network(
                         imageUrl,
                         fit: BoxFit.contain,
-                        loadingBuilder: (context, child, loadingProgress) {
+
+                        loadingBuilder:
+                            (context, child, loadingProgress) {
                           if (loadingProgress == null) {
                             print("✅ Image loaded: $imageUrl");
                             return child;
                           }
                           return const Padding(
                             padding: EdgeInsets.all(24),
-                            child: Center(child: CircularProgressIndicator()),
+                            child: Center(
+                              child: CircularProgressIndicator(),
+                            ),
                           );
                         },
-                        errorBuilder: (context, error, stackTrace) {
-                          print("🚨 Image ERROR: $imageUrl");
-                          print("❌ Error Detail: $error");
-                          print("📍 StackTrace: $stackTrace");
+
+                        errorBuilder:
+                            (context, error, stackTrace) {
+                          print("🚨 IMAGE ERROR");
+                          print("URL: $imageUrl");
+                          print("Error: $error");
 
                           return const Padding(
                             padding: EdgeInsets.all(8),
@@ -159,9 +159,10 @@ imageUrl = 'http://localhost:8000/storage/about/$filename';
                       ),
                     ),
 
-                  if (imageUrl != null) const SizedBox(height: 12),
+                  if (imageUrl != null && imageUrl.isNotEmpty)
+                    const SizedBox(height: 12),
 
-                  /// 📄 KONTEN
+                  /// ================= KONTEN =================
                   Text(
                     about.content,
                     textAlign: TextAlign.justify,
@@ -189,7 +190,10 @@ imageUrl = 'http://localhost:8000/storage/about/$filename';
         children: [
           Opacity(
             opacity: 0.7,
-            child: Image.asset('assets/images/logo_bps.png', height: 34),
+            child: Image.asset(
+              'assets/images/logo_bps.png',
+              height: 34,
+            ),
           ),
           const SizedBox(height: 8),
           const Text(
